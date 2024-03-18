@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:quiz_game/views/question_answer_page.dart';
 
 class HomeScreen extends StatelessWidget {
   static const String routeName = '/home';
@@ -14,7 +16,9 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(onPressed: () {}, child: const Text('start new game')),
+            ElevatedButton(onPressed: () {
+              Get.toNamed(QuestionAnswerPage.routeName);
+            }, child: const Text('start new game')),
             const SizedBox(height: 10,),
             const Text(' high score of the best quiz round')
           ],

@@ -35,26 +35,26 @@ class QuizModel {
 }
 
 class Answers {
-  String? a;
-  String? b;
-  String? c;
-  String? d;
+  String? A;
+  String? B;
+  String? C;
+  String? D;
 
-  Answers({this.a, this.b, this.c, this.d});
+  Answers({this.A, this.B, this.C, this.D});
 
   Answers.fromJson(Map<String, dynamic> json) {
-    a = json['A'];
-    b = json['B'];
-    c = json['C'];
-    d = json['D'];
+    A = json['A'];
+    B = json['B'];
+    C = json['C'];
+    D = json['D'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['A'] = a;
-    data['B'] = b;
-    data['C'] = c;
-    data['D'] = d;
+    data['A'] = A;
+    data['B'] = B;
+    data['C'] = C;
+    data['D'] = D;
     return data;
   }
 }
