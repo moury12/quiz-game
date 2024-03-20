@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             ElevatedButton(onPressed: () {
               Get.toNamed(QuestionAnswerPage.routeName);
+             /* QuizController.to.startTimerForNextQuestion();*/
             }, child: const Text('start new game')),
             const SizedBox(height: 10,),
 

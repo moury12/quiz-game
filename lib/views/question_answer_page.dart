@@ -15,9 +15,26 @@ class QuestionAnswerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) => showDialog(builder: (context) => const AlertDialog
-        (content: Text('You have to finish your exam'),
-      ), context: context,),
+      onPopInvoked: (didPop) => showDialog(
+        builder: (context) => AlertDialog(
+          content: const Text('Are you sure to give up'),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Get.offAllNamed(HomeScreen.routeName);
+                  QuizController.to.resetState();
+                  QuizController.to.getHighScore();
+                },
+                child: const Text('Yes')),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('No')),
+          ],
+        ),
+        context: context,
+      ),
       child: Scaffold(
         body: Obx(() {
           if (QuizController.to.questionList.isEmpty) {
@@ -64,65 +81,90 @@ class QuestionAnswerPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),/*
+                LinearProgressIndicator(
+                  value: QuizController.to.progressValue.value,
+                  minHeight: 10,
+                  backgroundColor: Colors.grey,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),*/
+                const SizedBox(
+                  height: 20,
                 ),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: Column(
-                          children: [
-                            Align(
-                                alignment: Alignment.topRight,
-                                child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.blueAccent,
-                                        borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomLeft: Radius.circular(10))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        currentQuestion.score.toString(),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ))),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                currentQuestion.question!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 20,fontWeight:
-                                FontWeight.w600),
-                              ),
-                            ),
-                            if (currentQuestion.questionImageUrl != null)
-                              Image.network(
-                                currentQuestion.questionImageUrl!,
-                                height: 200,
-                                width: 200,
-                                loadingBuilder:(context, child,
-          loadingProgress) => const CircularProgressIndicator(),
-                                errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                  size: 200,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Column(
+                            children: [
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                      decoration: const BoxDecoration(
+                                          color: Colors.blueAccent,
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          currentQuestion.score.toString(),
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ))),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  currentQuestion.question!,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
-                            const SizedBox(height: 20),
-                          ],
+                              if (currentQuestion.questionImageUrl != null)
+                                Image.network(
+                                  currentQuestion.questionImageUrl!,
+                                  height: 200,
+                                  width: 200,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) =>
+                                          const CircularProgressIndicator(),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                    size: 200,
+                                  ),
+                                ),
+                              const SizedBox(height: 20),
+                            ],
+                          ),
                         ),
-                      ),
-                      ..._buildAnswerButtons(currentQuestion),
-                    ],
+                        ..._buildAnswerButtons(currentQuestion),
+                      ],
+                    ),
                   ),
                 ),
+                QuizController.to.gameOver.value
+                    ? ElevatedButton(
+                        onPressed: () {
+                          Get.offAllNamed(HomeScreen.routeName);
+                          QuizController.to.resetState();
+                          QuizController.to.getHighScore();
+                        },
+                        child: const Text('Main Menu'))
+                    : const SizedBox.shrink(),
+                const SizedBox(
+                  height: 30,
+                )
               ],
             );
           }
@@ -133,7 +175,10 @@ class QuestionAnswerPage extends StatelessWidget {
 
   List<Widget> _buildAnswerButtons(QuizModel question) {
     List<String?> optionKeys = ['A', 'B', 'C', 'D'];
-   if(!QuizController.to.answered.value) startTimerForNextQuestion();
+    if (!QuizController.to.answered.value ||
+        !QuizController.to.gameOver.value) {
+      QuizController.to.startTimerForNextQuestion();
+    }
 
     return optionKeys.map((optionKey) {
       String? optionText = _getOptionText(question.answers!, optionKey ?? '');
@@ -141,22 +186,24 @@ class QuestionAnswerPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         child: ElevatedButton(
           onPressed: QuizController.to.answered.value ||
-              QuizController.to.gameOver.value
+                  QuizController.to.gameOver.value
               ? null
               : () {
-
-            QuizController.to.answerQuestion(optionKey ?? '');
-            _cancelTimerIfQuizOver();
-
-          },
+                  QuizController.to.answerQuestion(optionKey ?? '');
+                  if (!QuizController.to.answered.value) {
+                    QuizController.to.startTimerForNextQuestion();
+                  } else {
+                    QuizController.to.cancelTimerIfQuizOver();
+                  }
+                },
           style: ButtonStyle(
             backgroundColor: QuizController.to.answered.value &&
-                optionKey == question.correctAnswer
+                    optionKey == question.correctAnswer
                 ? MaterialStateProperty.all(Colors.green)
                 : QuizController.to.answered.value &&
-                optionKey == QuizController.to.wrongAnswer.value
-                ? MaterialStateProperty.all(Colors.red)
-                : null,
+                        optionKey == QuizController.to.wrongAnswer.value
+                    ? MaterialStateProperty.all(Colors.red)
+                    : null,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
@@ -173,18 +220,9 @@ class QuestionAnswerPage extends StatelessWidget {
       );
     }).toList();
   }
-  void startTimerForNextQuestion() {
-    QuizController.to.questionTimer = Timer(const Duration(seconds: 5), () {
-      QuizController.to.nextQuestion();
-    });
-  }
 
-  void _cancelTimerIfQuizOver() {
-    if (QuizController.to.currentQuestionIndex.value ==
-        QuizController.to.questionList.length - 1) {
-      QuizController.to.questionTimer?.cancel();
-    }
-  }
+
+
   String? _getOptionText(Answers answers, String optionKey) {
     switch (optionKey) {
       case 'A':

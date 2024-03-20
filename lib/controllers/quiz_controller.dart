@@ -54,15 +54,15 @@ class QuizController extends GetxController {
       wrongAnswer.value = '';
     } else {
       gameOver.value = true;
+
       finishQuiz();
     }
   }
 
   void answerQuestion(String selectedAnswer) {
     if (!answered.value) {
-      questionTimer?.cancel();
-      _startTimerForNextQuestion();
       answered.value = true;
+      debugPrint(questionTimer?.tick.milliseconds.toString());
       if (selectedAnswer.isEmpty) {
         wrongAnswer.value =
             questionList[currentQuestionIndex.value].correctAnswer ?? '';
@@ -75,23 +75,20 @@ class QuizController extends GetxController {
     }
   }
 
-  void _startTimerForNextQuestion() {
-    questionTimer?.cancel();
-    questionTimer = Timer(const Duration(seconds: 2), () {
-      nextQuestion();
-    });
-  }
+
+
 
   void nextQuestion() {
     if (currentQuestionIndex.value < questionList.length - 1) {
+
       currentQuestionIndex.value++;
       answered.value = false;
       wrongAnswer.value = '';
     } else {
       gameOver.value = true;
-/*
+
       questionTimer?.cancel();
-*/
+
       showHighScoreDialog(score.value);
       finishQuiz();
     }
@@ -104,7 +101,20 @@ class QuizController extends GetxController {
       await DatabaseHelper.updateHighScore(currentScore);
     }
   }
+  void startTimerForNextQuestion() {
+    questionTimer?.cancel();
+    final duration = answered.value ? 1 : 10;
+    questionTimer = Timer(Duration(seconds: duration), () {
+      nextQuestion();
+    });
+  }
 
+  void cancelTimerIfQuizOver() {
+    if (currentQuestionIndex.value ==
+        questionList.length - 1) {
+      questionTimer?.cancel();
+    }
+  }
   void showHighScoreDialog(int currentScore) {
     Get.defaultDialog(
       barrierDismissible: false,
