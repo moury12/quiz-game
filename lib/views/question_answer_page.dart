@@ -65,7 +65,6 @@ class QuestionAnswerPage extends StatelessWidget {
                     ],
                   ),
                 ),
-              if(QuizController.to.gameOver.value)
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -134,6 +133,7 @@ class QuestionAnswerPage extends StatelessWidget {
 
   List<Widget> _buildAnswerButtons(QuizModel question) {
     List<String?> optionKeys = ['A', 'B', 'C', 'D'];
+   if(!QuizController.to.answered.value) startTimerForNextQuestion();
 
     return optionKeys.map((optionKey) {
       String? optionText = _getOptionText(question.answers!, optionKey ?? '');
@@ -147,7 +147,6 @@ class QuestionAnswerPage extends StatelessWidget {
 
             QuizController.to.answerQuestion(optionKey ?? '');
             _cancelTimerIfQuizOver();
-            startTimerForNextQuestion();
 
           },
           style: ButtonStyle(
@@ -175,7 +174,7 @@ class QuestionAnswerPage extends StatelessWidget {
     }).toList();
   }
   void startTimerForNextQuestion() {
-    QuizController.to.questionTimer = Timer(const Duration(seconds: 10), () {
+    QuizController.to.questionTimer = Timer(const Duration(seconds: 5), () {
       QuizController.to.nextQuestion();
     });
   }
