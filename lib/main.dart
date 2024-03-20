@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quiz_game/bindings/initial_binding.dart';
+import 'package:quiz_game/db/database_helper.dart';
 import 'package:quiz_game/views/home_page.dart';
 
 import 'routes/app_routes.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await DatabaseHelper.initDatabase();
+  } catch (e) {
+    debugPrint(e.toString());
+  }
   runApp(const MyApp());
 }
 

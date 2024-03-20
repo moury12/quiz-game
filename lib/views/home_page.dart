@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quiz_game/controllers/quiz_controller.dart';
 import 'package:quiz_game/views/question_answer_page.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,7 +21,13 @@ class HomeScreen extends StatelessWidget {
               Get.toNamed(QuestionAnswerPage.routeName);
             }, child: const Text('start new game')),
             const SizedBox(height: 10,),
-            const Text(' high score of the best quiz round')
+
+             Obx(
+               () {
+                 return Text(' high score of the best quiz round ${QuizController
+                    .to.highScore.value??0}');
+               }
+             )
           ],
         ),
       ),
