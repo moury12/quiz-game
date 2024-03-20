@@ -54,7 +54,6 @@ class QuizController extends GetxController {
       wrongAnswer.value = '';
     } else {
       gameOver.value = true;
-      showHighScoreDialog(score.value);
       finishQuiz();
     }
   }
@@ -108,6 +107,7 @@ class QuizController extends GetxController {
 
   void showHighScoreDialog(int currentScore) {
     Get.defaultDialog(
+      barrierDismissible: false,
       title: 'Game Over',
       content: Column(
         children: [
